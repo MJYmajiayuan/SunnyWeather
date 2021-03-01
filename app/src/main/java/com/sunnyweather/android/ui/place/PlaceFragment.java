@@ -64,6 +64,14 @@ public class PlaceFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString() != null) {
+                    viewModel.searchPlaces(s.toString());
+                } else {
+                    recyclerView.setVisibility(View.GONE);
+                    bgImageView.setVisibility(View.VISIBLE);
+                    viewModel.placeList.clear();
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
