@@ -19,7 +19,7 @@ import java.util.List;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
 
-    private Fragment fragment;
+    private PlaceFragment fragment;
     private List<Place> placeList;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -32,7 +32,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         }
     }
 
-    public PlaceAdapter(Fragment fragment, List<Place> placeList) {
+    public PlaceAdapter(PlaceFragment fragment, List<Place> placeList) {
         this.fragment = fragment;
         this.placeList = placeList;
     }
@@ -51,7 +51,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
                 intent.putExtra("location_lng", place.getLocation().getLng());
                 intent.putExtra("location_lat", place.getLocation().getLat());
                 intent.putExtra("place_name", place.getName());
+                fragment.viewModel.savePlace(place);
                 fragment.startActivity(intent);
+                if (fragment.getActivity() != null) {
+                    fragment.getActivity().finish();
+                }
                 Log.d("Debug", "onClick running...");
             }
         });

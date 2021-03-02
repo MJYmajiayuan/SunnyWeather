@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.sunnyweather.android.logic.dao.PlaceDao;
 import com.sunnyweather.android.logic.model.DailyResponse;
 import com.sunnyweather.android.logic.model.Place;
 import com.sunnyweather.android.logic.model.PlaceResponse;
@@ -137,5 +138,17 @@ public class Repository {
         DailyResponse dailyResponse = new DailyResponse("ok", result);
 
         return dailyResponse;
+    }
+
+    public void savePlace(Place place) {
+        PlaceDao.getInstance().savePlace(place);
+    }
+
+    public Place getSavedPlace() {
+        return PlaceDao.getInstance().getSavedPlace();
+    }
+
+    public boolean isPlaceSaved() {
+        return PlaceDao.getInstance().isPlaceSaved();
     }
 }

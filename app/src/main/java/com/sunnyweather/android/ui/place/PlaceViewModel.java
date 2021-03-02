@@ -19,4 +19,16 @@ public class PlaceViewModel extends ViewModel {
     void searchPlaces(String query) {
         searchLiveData.setValue(query);
     }
+
+    public void savePlace(Place place) {
+        Repository.getInstance().savePlace(place);
+    }
+
+    public Place getSavedPlace() {
+        return Repository.getInstance().getSavedPlace();
+    }
+
+    public boolean isPlaceSaved() {
+        return Repository.getInstance().isPlaceSaved();
+    }
 }
