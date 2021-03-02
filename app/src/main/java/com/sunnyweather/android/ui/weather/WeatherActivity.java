@@ -63,12 +63,16 @@ public class WeatherActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_weather);
 
+        // 初始化控件
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         navBtn = (Button) findViewById(R.id.navBtn);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
         Log.d("Debug", "WeatherActivity setContentView completed...");
 
+        /**
+         * 从intent中获取数据
+         */
         viewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
         if (viewModel.locationLng.isEmpty()) {
             String lng = getIntent().getStringExtra("location_lng");
@@ -85,8 +89,9 @@ public class WeatherActivity extends AppCompatActivity {
 
         Log.d("Debug", "ViewModel completed");
 
-//        showWeatherInfo(getNullWeather());
-
+        /**
+         * 对liveData设置观察者
+         */
         viewModel.weatherLiveData.observe(this, new Observer<Weather>() {
             @Override
             public void onChanged(Weather weather) {
@@ -99,6 +104,10 @@ public class WeatherActivity extends AppCompatActivity {
                 swipeRefresh.setRefreshing(false);
             }
         });
+
+        /**
+         * 下拉菜单的逻辑处理
+         */
         swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);
         refreshWeather();
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -207,7 +216,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void refreshWeather() {
-        viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat);
         swipeRefresh.setRefreshing(true);
+        viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat);
     }
 }
