@@ -112,6 +112,7 @@ public class PlaceFragment extends Fragment {
                     bgImageView.setVisibility(View.GONE);
                     viewModel.placeList.clear();
                     viewModel.placeList.addAll(placeList);
+                    adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getActivity(), "未能查询到任何地点", Toast.LENGTH_SHORT).show();
                 }
