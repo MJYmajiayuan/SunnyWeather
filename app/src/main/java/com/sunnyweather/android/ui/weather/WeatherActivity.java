@@ -1,15 +1,22 @@
 package com.sunnyweather.android.ui.weather;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,7 +38,7 @@ import java.util.Locale;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    WeatherViewModel viewModel;
+    public WeatherViewModel viewModel;
     private TextView placeName;
     private TextView currentTemp;
     private TextView currentSky;
@@ -43,14 +50,22 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView ultravioletText;
     private TextView carWashingText;
     private ScrollView weatherLayout;
+    private SwipeRefreshLayout swipeRefresh;
+    private Button navBtn;
+    public DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // 设置沉浸式状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_weather);
+
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        navBtn = (Button) findViewById(R.id.navBtn);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
         Log.d("Debug", "WeatherActivity setContentView completed...");
 
@@ -81,10 +96,51 @@ public class WeatherActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(WeatherActivity.this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show();
                 }
+                swipeRefresh.setRefreshing(false);
+            }
+        });
+        swipeRefresh.setColorSchemeResources(R.color.design_default_color_primary);
+        refreshWeather();
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshWeather();
             }
         });
         Log.d("Debug", "Observe completed");
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat);
+
+        /**
+         * 滑动菜单逻辑处理
+         */
+        navBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                manager.hideSoftInputFromWindow(drawerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
     }
 
     private void showWeatherInfo(Weather weather) {
@@ -148,5 +204,10 @@ public class WeatherActivity extends AppCompatActivity {
         weatherLayout.setVisibility(View.VISIBLE);
 
         Log.d("Debug", "showWeatherInfo completed");
+    }
+
+    public void refreshWeather() {
+        viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat);
+        swipeRefresh.setRefreshing(true);
     }
 }

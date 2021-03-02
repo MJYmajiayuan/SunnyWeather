@@ -9,10 +9,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sunnyweather.android.R;
 import com.sunnyweather.android.logic.model.Place;
+import com.sunnyweather.android.logic.model.Weather;
 import com.sunnyweather.android.ui.weather.WeatherActivity;
 
 import java.util.List;
@@ -47,15 +49,25 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Place place = placeList.get(position);
-                Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
-                intent.putExtra("location_lng", place.getLocation().getLng());
-                intent.putExtra("location_lat", place.getLocation().getLat());
-                intent.putExtra("place_name", place.getName());
-                fragment.viewModel.savePlace(place);
-                fragment.startActivity(intent);
-                if (fragment.getActivity() != null) {
-                    fragment.getActivity().finish();
+                FragmentActivity activity = fragment.getActivity();
+                if (activity instanceof WeatherActivity) {
+                    WeatherActivity weatherActivity = (WeatherActivity) activity;
+                    weatherActivity.drawerLayout.closeDrawers();
+                    weatherActivity.viewModel.locationLng = place.getLocation().getLng();
+                    weatherActivity.viewModel.locationLat = place.getLocation().getLat();
+                    weatherActivity.viewModel.placeName = place.getName();
+                    weatherActivity.refreshWeather();
+                } else {
+                    Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
+                    intent.putExtra("location_lng", place.getLocation().getLng());
+                    intent.putExtra("location_lat", place.getLocation().getLat());
+                    intent.putExtra("place_name", place.getName());
+                    fragment.startActivity(intent);
+                    if (activity != null) {
+                        activity.finish();
+                    }
                 }
+                fragment.viewModel.savePlace(place);
                 Log.d("Debug", "onClick running...");
             }
         });
